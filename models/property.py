@@ -5,7 +5,7 @@ from datetime import datetime
 class Property(models.Model):
     _name = 'property.property'
     _description = 'Property'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _order = 'name'
 
     name = fields.Char(string='Property Name', required=True, tracking=True)

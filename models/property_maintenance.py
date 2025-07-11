@@ -5,7 +5,7 @@ from datetime import datetime, date, timedelta
 class PropertyMaintenance(models.Model):
     _name = 'property.maintenance'
     _description = 'Property Maintenance'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _order = 'request_date desc, priority desc'
     
     name = fields.Char(string='Reference', required=True, copy=False, 

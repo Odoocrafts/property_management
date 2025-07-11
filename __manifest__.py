@@ -15,7 +15,10 @@
         "mail",
         "account",
         "contacts",
-        "product"
+        "product",
+        "portal",
+        "website",
+        "website_form"
     ],
     "data": [
         "security/property_security.xml",
@@ -25,6 +28,8 @@
         "views/property_unit_views.xml",
         "views/property_contract_views.xml",
         "views/property_maintenance_views.xml",
+        "views/portal_templates.xml",
+        "views/website_templates.xml",
         "wizards/property_contract_renew_wizard.xml",
         "wizards/maintenance_wizard.xml",
         "views/property_menu.xml",

@@ -5,7 +5,7 @@ from datetime import datetime, date
 class PropertyUnit(models.Model):
     _name = 'property.unit'
     _description = 'Property Unit'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     
     name = fields.Char(string='Unit Number/Name', required=True, tracking=True)
     code = fields.Char(string='Unit Code', readonly=True, copy=False, default=lambda self: _('New'))

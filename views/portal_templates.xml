@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add menu items to portal -->
+    <template id="portal_my_home_menu_property" name="Portal Menu Property" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_breadcrumbs')]" position="inside">
+            <li t-if="page_name == 'property'" class="o_portal_breadcrumbs_item">Properties</li>
+            <li t-if="page_name == 'property_detail'" class="o_portal_breadcrumbs_item">
+                <a t-if="unit" t-attf-href="/my/properties">Properties</a>
+                <t t-else="">Properties</t>
+            </li>
+            <li t-if="page_name == 'property_detail' and unit" class="o_portal_breadcrumbs_item">
+                <t t-esc="unit.name"/>
+            </li>
+
+            <li t-if="page_name == 'maintenance'" class="o_portal_breadcrumbs_item">Maintenance Requests</li>
+            <li t-if="page_name == 'maintenance_detail'" class="o_portal_breadcrumbs_item">
+                <a t-if="maintenance" t-attf-href="/my/maintenance">Maintenance Requests</a>
+                <t t-else="">Maintenance Requests</t>
+            </li>
+            <li t-if="page_name == 'maintenance_detail' and maintenance" class="o_portal_breadcrumbs_item">
+                <t t-esc="maintenance.name"/>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Add menu items to portal home page -->
+    <template id="portal_my_home_property" name="Portal My Home Property" inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">My Properties</t>
+                <t t-set="url" t-value="'/my/properties'"/>
+                <t t-set="placeholder_count" t-value="'property_unit_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Maintenance Requests</t>
+                <t t-set="url" t-value="'/my/maintenance'"/>
+                <t t-set="placeholder_count" t-value="'maintenance_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Property Units List -->
+    <template id="portal_my_properties" name="My Properties">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Properties</t>
+            </t>
+            <t t-if="not units">
+                <div class="alert alert-info">
+                    <p>You don't have any properties assigned.</p>
+                </div>
+            </t>
+            <t t-if="units">
+                <table class="table table-striped table-hover o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Property</th>
+                            <th>Unit</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="units" t-as="unit">
+                            <tr>
+                                <td>
+                                    <a t-attf-href="/my/property/#{unit.id}">
+                                        <t t-esc="unit.property_id.name"/>
+                                    </a>
+                                </td>
+                                <td><t t-esc="unit.name"/></td>
+                                <td>
+                                    <t t-if="unit.state == 'occupied'">
+                                        <span class="badge bg-success">Occupied</span>
+                                    </t>
+                                    <t t-elif="unit.state == 'vacant'">
+                                        <span class="badge bg-info">Vacant</span>
+                                    </t>
+                                    <t t-elif="unit.state == 'under_maintenance'">
+                                        <span class="badge bg-warning">Under Maintenance</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge bg-secondary"><t t-esc="unit.state"/></span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="o_portal_pager">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Property Unit Detail -->
+    <template id="portal_property_detail" name="Property Detail">
+        <t t-call="portal.portal_layout">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><t t-esc="unit.name"/> at <t t-esc="unit.property_id.name"/></h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Property Details</h5>
+                                    <p><strong>Address:</strong> <t t-esc="unit.property_id.street"/> <t t-esc="unit.property_id.street2"/> <t t-esc="unit.property_id.city"/>, <t t-esc="unit.property_id.state_id.name"/> <t t-esc="unit.property_id.zip"/></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Unit Information</h5>
+                                    <p><strong>Type:</strong> <t t-esc="unit.unit_type"/></p>
+                                    <p><strong>Size:</strong> <t t-esc="unit.size"/> <t t-esc="unit.size_uom"/></p>
+                                    <p><strong>Status:</strong> <t t-esc="unit.state"/></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <h5>Maintenance Requests</h5>
+                                <a t-attf-href="/maintenance/request?unit_id=#{unit.id}" class="btn btn-primary">Submit Maintenance Request</a>
+                                <t t-set="maintenance_requests" t-value="request.env['property.maintenance'].sudo().search([('unit_id', '=', unit.id), ('request_by', '=', request.env.user.partner_id.id)])"/>
+                                <t t-if="not maintenance_requests">
+                                    <p class="mt-2">No maintenance requests found for this unit.</p>
+                                </t>
+                                <t t-if="maintenance_requests">
+                                    <table class="table table-sm table-striped mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>Reference</th>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="maintenance_requests" t-as="mr">
+                                                <tr>
+                                                    <td>
+                                                        <a t-attf-href="/my/maintenance/#{mr.id}">
+                                                            <t t-esc="mr.name"/>
+                                                        </a>
+                                                    </td>
+                                                    <td><t t-esc="mr.maintenance_type"/></td>
+                                                    <td><t t-esc="mr.request_date"/></td>
+                                                    <td>
+                                                        <t t-if="mr.state == 'new'">
+                                                            <span class="badge bg-primary">New</span>
+                                                        </t>
+                                                        <t t-elif="mr.state == 'assigned'">
+                                                            <span class="badge bg-info">Assigned</span>
+                                                        </t>
+                                                        <t t-elif="mr.state == 'in_progress'">
+                                                            <span class="badge bg-warning">In Progress</span>
+                                                        </t>
+                                                        <t t-elif="mr.state == 'done'">
+                                                            <span class="badge bg-success">Done</span>
+                                                        </t>
+                                                        <t t-elif="mr.state == 'cancelled'">
+                                                            <span class="badge bg-danger">Cancelled</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Maintenance Requests List -->
+    <template id="portal_my_maintenance" name="My Maintenance Requests">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Maintenance Requests</t>
+            </t>
+            <div class="mb-3">
+                <a href="/maintenance/request" class="btn btn-primary">Submit New Request</a>
+            </div>
+            <t t-if="not maintenance_requests">
+                <div class="alert alert-info">
+                    <p>You don't have any maintenance requests.</p>
+                </div>
+            </t>
+            <t t-if="maintenance_requests">
+                <table class="table table-striped table-hover o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Reference</th>
+                            <th>Property</th>
+                            <th>Unit</th>
+                            <th>Date</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="maintenance_requests" t-as="maintenance">
+                            <tr>
+                                <td>
+                                    <a t-attf-href="/my/maintenance/#{maintenance.id}">
+                                        <t t-esc="maintenance.name"/>
+                                    </a>
+                                </td>
+                                <td><t t-esc="maintenance.property_id.name"/></td>
+                                <td><t t-esc="maintenance.unit_id.name"/></td>
+                                <td><t t-esc="maintenance.request_date"/></td>
+                                <td>
+                                    <t t-if="maintenance.priority == '0'">
+                                        <span class="badge bg-secondary">Low</span>
+                                    </t>
+                                    <t t-elif="maintenance.priority == '1'">
+                                        <span class="badge bg-info">Normal</span>
+                                    </t>
+                                    <t t-elif="maintenance.priority == '2'">
+                                        <span class="badge bg-warning">High</span>
+                                    </t>
+                                    <t t-elif="maintenance.priority == '3'">
+                                        <span class="badge bg-danger">Urgent</span>
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-if="maintenance.state == 'new'">
+                                        <span class="badge bg-primary">New</span>
+                                    </t>
+                                    <t t-elif="maintenance.state == 'assigned'">
+                                        <span class="badge bg-info">Assigned</span>
+                                    </t>
+                                    <t t-elif="maintenance.state == 'in_progress'">
+                                        <span class="badge bg-warning">In Progress</span>
+                                    </t>
+                                    <t t-elif="maintenance.state == 'done'">
+                                        <span class="badge bg-success">Done</span>
+                                    </t>
+                                    <t t-elif="maintenance.state == 'cancelled'">
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="o_portal_pager">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Maintenance Request Detail -->
+    <template id="portal_maintenance_detail" name="Maintenance Request Detail">
+        <t t-call="portal.portal_layout">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>Maintenance Request: <t t-esc="maintenance.name"/></h4>
+                            <div>
+                                <t t-if="maintenance.state == 'new'">
+                                    <span class="badge bg-primary">New</span>
+                                </t>
+                                <t t-elif="maintenance.state == 'assigned'">
+                                    <span class="badge bg-info">Assigned</span>
+                                </t>
+                                <t t-elif="maintenance.state == 'in_progress'">
+                                    <span class="badge bg-warning">In Progress</span>
+                                </t>
+                                <t t-elif="maintenance.state == 'done'">
+                                    <span class="badge bg-success">Done</span>
+                                </t>
+                                <t t-elif="maintenance.state == 'cancelled'">
+                                    <span class="badge bg-danger">Cancelled</span>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Basic Information</h5>
+                                    <p><strong>Property:</strong> <t t-esc="maintenance.property_id.name"/></p>
+                                    <p><strong>Unit:</strong> <t t-esc="maintenance.unit_id.name"/></p>
+                                    <p><strong>Requested By:</strong> <t t-esc="maintenance.request_by.name"/></p>
+                                    <p><strong>Request Date:</strong> <t t-esc="maintenance.request_date"/></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Request Details</h5>
+                                    <p><strong>Type:</strong> <t t-esc="maintenance.maintenance_type"/></p>
+                                    <p><strong>Priority:</strong>
+                                        <t t-if="maintenance.priority == '0'">
+                                            <span class="badge bg-secondary">Low</span>
+                                        </t>
+                                        <t t-elif="maintenance.priority == '1'">
+                                            <span class="badge bg-info">Normal</span>
+                                        </t>
+                                        <t t-elif="maintenance.priority == '2'">
+                                            <span class="badge bg-warning">High</span>
+                                        </t>
+                                        <t t-elif="maintenance.priority == '3'">
+                                            <span class="badge bg-danger">Urgent</span>
+                                        </t>
+                                    </p>
+                                    <p t-if="maintenance.schedule_date"><strong>Scheduled Date:</strong> <t t-esc="maintenance.schedule_date"/></p>
+                                    <p t-if="maintenance.start_date"><strong>Start Date:</strong> <t t-esc="maintenance.start_date"/></p>
+                                    <p t-if="maintenance.end_date"><strong>End Date:</strong> <t t-esc="maintenance.end_date"/></p>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <h5>Description</h5>
+                                    <p><t t-esc="maintenance.description"/></p>
+                                </div>
+                            </div>
+                            <div class="row mt-3" t-if="maintenance.solution">
+                                <div class="col-12">
+                                    <h5>Solution</h5>
+                                    <p><t t-esc="maintenance.solution"/></p>
+                                </div>
+                            </div>
+                            <div class="row mt-3" t-if="maintenance.state == 'done'">
+                                <div class="col-12">
+                                    <h5>Costs</h5>
+                                    <p><strong>Labor Cost:</strong> <t t-esc="maintenance.labor_cost"/> <t t-esc="maintenance.currency_id.symbol"/></p>
+                                    <p><strong>Materials Cost:</strong> <t t-esc="maintenance.materials_cost"/> <t t-esc="maintenance.currency_id.symbol"/></p>
+                                    <p><strong>Total Cost:</strong> <t t-esc="maintenance.total_cost"/> <t t-esc="maintenance.currency_id.symbol"/></p>
+                                </div>
+                            </div>
+                            <div class="row mt-3" t-if="maintenance.checklist_ids">
+                                <div class="col-12">
+                                    <h5>Checklist</h5>
+                                    <ul class="list-group">
+                                        <t t-foreach="maintenance.checklist_ids" t-as="item">
+                                            <li class="list-group-item">
+                                                <t t-if="item.is_done">
+                                                    <i class="fa fa-check-square text-success"></i>
+                                                </t>
+                                                <t t-else="">
+                                                    <i class="fa fa-square"></i>
+                                                </t>
+                                                <span class="ml-2"><t t-esc="item.name"/></span>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row mt-3" t-if="maintenance.attachment_ids">
+                                <div class="col-12">
+                                    <h5>Documents</h5>
+                                    <div class="list-group">
+                                        <t t-foreach="maintenance.attachment_ids" t-as="attachment">
+                                            <a t-attf-href="/web/content/#{attachment.id}?download=true" class="list-group-item list-group-item-action">
+                                                <i class="fa fa-download"></i> <t t-esc="attachment.name"/>
+                                            </a>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

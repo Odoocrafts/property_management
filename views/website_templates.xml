@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Website Properties List -->
+    <template id="website_properties" name="Available Properties">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="mb-4">Available Properties</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <t t-if="not properties">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <p>No properties available at the moment.</p>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-foreach="properties" t-as="property">
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><t t-esc="property.name"/></h5>
+                                    <p class="card-text">
+                                        <t t-esc="property.street"/><br/>
+                                        <t t-if="property.street2"><t t-esc="property.street2"/><br/></t>
+                                        <t t-esc="property.city"/>, <t t-esc="property.state_id.name"/> <t t-esc="property.zip"/>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <a t-att-href="'/properties/%s' % property.id" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Website Property Detail -->
+    <template id="website_property_detail" name="Property Detail">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/properties">Properties</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><t t-esc="property.name"/></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h1><t t-esc="property.name"/></h1>
+                        <p class="lead">
+                            <t t-esc="property.street"/><br/>
+                            <t t-if="property.street2"><t t-esc="property.street2"/><br/></t>
+                            <t t-esc="property.city"/>, <t t-esc="property.state_id.name"/> <t t-esc="property.zip"/>
+                        </p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Property Description</h4>
+                                <p t-field="property.description"/>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h4>Available Units</h4>
+                                <t t-if="not available_units">
+                                    <p>No units are currently available in this property.</p>
+                                </t>
+                                <div class="row">
+                                    <t t-foreach="available_units" t-as="unit">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h5 class="card-title"><t t-esc="unit.name"/></h5>
+                                                    <p><strong>Type:</strong> <t t-esc="unit.unit_type"/></p>
+                                                    <p><strong>Size:</strong> <t t-esc="unit.size"/> <t t-esc="unit.size_uom"/></p>
+                                                    <p><strong>Monthly Rent:</strong> <t t-esc="unit.rent"/> <t t-esc="unit.currency_id.symbol"/></p>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a href="/contactus" class="btn btn-primary">Inquire Now</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>Quick Contact</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Interested in this property? Contact us for more information.</p>
+                                <a href="/contactus" class="btn btn-primary btn-block">Contact Us</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Report a Maintenance Issue</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Current tenants can report maintenance issues online.</p>
+                                <a href="/maintenance/request" class="btn btn-outline-primary btn-block">Report Issue</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Website Maintenance Request Form -->
+    <template id="website_maintenance_request" name="Maintenance Request">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="mb-4">Submit a Maintenance Request</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <form action="/maintenance/submit" method="post" class="o_website_form" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                            <div class="form-group mb-3">
+                                <label for="property_id" class="form-label">Property</label>
+                                <select id="property_id" name="property_id" class="form-select" required="required">
+                                    <option value="">Select a property</option>
+                                    <t t-foreach="properties" t-as="property">
+                                        <option t-att-value="property.id" t-att-selected="property.id == int(request.params.get('property_id', 0))"><t t-esc="property.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="unit_id" class="form-label">Unit (optional)</label>
+                                <select id="unit_id" name="unit_id" class="form-select">
+                                    <option value="">Select a unit</option>
+                                    <t t-if="request.params.get('unit_id')">
+                                        <t t-set="unit" t-value="request.env['property.unit'].sudo().browse(int(request.params.get('unit_id')))"/>
+                                        <option t-att-value="unit.id" selected="selected"><t t-esc="unit.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <t t-if="not request.env.user._is_public()">
+                                <input type="hidden" name="name" t-att-value="request.env.user.partner_id.name"/>
+                                <input type="hidden" name="email" t-att-value="request.env.user.partner_id.email"/>
+                                <input type="hidden" name="phone" t-att-value="request.env.user.partner_id.phone"/>
+                            </t>
+                            <t t-else="">
+                                <div class="form-group mb-3">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input type="text" id="name" name="name" class="form-control" required="required"/>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="email" class="form-label">Your Email</label>
+                                    <input type="email" id="email" name="email" class="form-control" required="required"/>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="phone" class="form-label">Your Phone</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control"/>
+                                </div>
+                            </t>
+
+                            <div class="form-group mb-3">
+                                <label for="maintenance_type" class="form-label">Maintenance Type</label>
+                                <select id="maintenance_type" name="maintenance_type" class="form-select" required="required">
+                                    <option value="corrective">Corrective</option>
+                                    <option value="preventive">Preventive</option>
+                                    <option value="emergency">Emergency</option>
+                                    <option value="inspection">Inspection</option>
+                                    <option value="renovation">Renovation</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select id="priority" name="priority" class="form-select" required="required">
+                                    <option value="0">Low</option>
+                                    <option value="1" selected="selected">Normal</option>
+                                    <option value="2">High</option>
+                                    <option value="3">Urgent</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea id="description" name="description" class="form-control" rows="5" required="required"></textarea>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Contact Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>For emergency maintenance issues, please call our maintenance hotline:</p>
+                                <p><strong>Phone:</strong> (555) 123-4567</p>
+                                <p><strong>Email:</strong> maintenance@example.com</p>
+                                <p>For regular maintenance issues, please use this form.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#property_id').on('change', function() {
+                        var property_id = $(this).val();
+                        if (property_id) {
+                            $.ajax({
+                                url: '/units/get_by_property',
+                                type: 'POST',
+                                data: {
+                                    property_id: property_id,
+                                },
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                success: function(data) {
+                                    var units = data;
+                                    var options = '<option value="">Select a unit</option>';
+                                    for (var i = 0; i < units.length; i++) {
+                                        options += '<option value="' + units[i].id + '">' + units[i].name + '</option>';
+                                    }
+                                    $('#unit_id').html(options);
+                                },
+                            });
+                        } else {
+                            $('#unit_id').html('<option value="">Select a unit</option>');
+                        }
+                    });
+                });
+            </script>
+        </t>
+    </template>
+
+    <!-- Website Maintenance Thanks Page -->
+    <template id="website_maintenance_thanks" name="Maintenance Request Submitted">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="jumbotron text-center">
+                            <h1 class="display-4">Thank You!</h1>
+                            <p class="lead">Your maintenance request has been successfully submitted.</p>
+                            <p>Reference Number: <strong><t t-esc="maintenance.name"/></strong></p>
+                            <p>We will process your request as soon as possible.</p>
+                            <hr class="my-4"/>
+                            <p>You can track the status of your request in your portal if you have an account.</p>
+                            <p class="mt-4">
+                                <a class="btn btn-primary" href="/my/maintenance">Go to My Maintenance Requests</a>
+                                <a class="btn btn-outline-primary" href="/">Return to Home</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

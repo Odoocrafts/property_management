@@ -39,5 +39,26 @@
             <field name="model_id" ref="model_property_maintenance"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         </record>
+        <!-- Portal Access Rules -->
+        <record id="property_portal_rule" model="ir.rule">
+            <field name="name">Portal users can only see properties they have access to</field>
+            <field name="model_id" ref="model_property_property"/>
+            <field name="domain_force">[('state', '=', 'available')]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <record id="property_unit_portal_rule" model="ir.rule">
+            <field name="name">Portal users can only see their own units</field>
+            <field name="model_id" ref="model_property_unit"/>
+            <field name="domain_force">[('tenant_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <record id="property_maintenance_portal_rule" model="ir.rule">
+            <field name="name">Portal users can only see their own maintenance requests</field>
+            <field name="model_id" ref="model_property_maintenance"/>
+            <field name="domain_force">[('request_by', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
     </data>
 </odoo>
