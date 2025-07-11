@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Property Management Security Group -->
+        <record id="group_property_user" model="res.groups">
+            <field name="name">Property User</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_property_manager" model="res.groups">
+            <field name="name">Property Manager</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="implied_ids" eval="[(4, ref('group_property_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Multi-company rules -->
+        <record id="property_comp_rule" model="ir.rule">
+            <field name="name">Property multi-company rule</field>
+            <field name="model_id" ref="model_property_property"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="property_unit_comp_rule" model="ir.rule">
+            <field name="name">Property Unit multi-company rule</field>
+            <field name="model_id" ref="model_property_unit"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="property_contract_comp_rule" model="ir.rule">
+            <field name="name">Property Contract multi-company rule</field>
+            <field name="model_id" ref="model_property_contract"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="property_maintenance_comp_rule" model="ir.rule">
+            <field name="name">Property Maintenance multi-company rule</field>
+            <field name="model_id" ref="model_property_maintenance"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

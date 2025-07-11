@@ -1,0 +1,23 @@
+# Python bytecode files
+*.py[cod]
+__pycache__/
+*.so
+.Python
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Odoo specific
+*.pot
+.DS_Store

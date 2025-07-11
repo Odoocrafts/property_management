@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_property_contract_renew_wizard_form" model="ir.ui.view">
+        <field name="name">property.contract.renew.wizard.form</field>
+        <field name="model">property.contract.renew.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Renew Contract">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="property_id" readonly="1"/>
+                            <field name="unit_id" readonly="1"/>
+                            <field name="tenant_id"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="rent_amount" widget="monetary"/>
+                            <field name="security_deposit" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="billing_cycle"/>
+                            <field name="payment_term_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_renew_contract" string="Renew Contract" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

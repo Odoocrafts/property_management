@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_property_management_root"
+              name="Property Management"
+              web_icon="property_management,static/description/icon.png"
+              sequence="10"/>
+    
+    <!-- Properties Menu -->
+    <menuitem id="menu_properties"
+              name="Properties"
+              parent="menu_property_management_root"
+              sequence="10"/>
+              
+    <!-- Properties submenu -->
+    <menuitem id="menu_properties_list"
+              name="Properties"
+              parent="menu_properties"
+              action="action_properties"
+              sequence="10"/>
+              
+    <menuitem id="menu_property_units"
+              name="Units"
+              parent="menu_properties"
+              action="action_property_units"
+              sequence="20"/>
+              
+    <menuitem id="menu_property_amenities"
+              name="Amenities"
+              parent="menu_properties"
+              action="action_property_amenities"
+              sequence="30"/>
+    
+    <!-- Contracts Menu -->
+    <menuitem id="menu_contracts"
+              name="Contracts"
+              parent="menu_property_management_root"
+              sequence="20"/>
+              
+    <!-- Contracts submenu -->
+    <menuitem id="menu_property_contracts"
+              name="Rental Contracts"
+              parent="menu_contracts"
+              action="action_property_contracts"
+              sequence="10"/>
+              
+    <!-- Maintenance Menu -->
+    <menuitem id="menu_maintenance"
+              name="Maintenance"
+              parent="menu_property_management_root"
+              sequence="30"/>
+              
+    <!-- Maintenance submenu -->
+    <menuitem id="menu_property_maintenance"
+              name="Maintenance Requests"
+              parent="menu_maintenance"
+              action="action_property_maintenance"
+              sequence="10"/>
+              
+    <!-- Configuration Menu -->
+    <menuitem id="menu_property_configuration"
+              name="Configuration"
+              parent="menu_property_management_root"
+              sequence="100"/>
+              
+    <!-- Reporting Menu -->
+    <menuitem id="menu_property_reporting"
+              name="Reporting"
+              parent="menu_property_management_root"
+              sequence="90"/>
+</odoo>

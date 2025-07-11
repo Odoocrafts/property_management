@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Property Unit Form View -->
+    <record id="property_unit_view_form" model="ir.ui.view">
+        <field name="name">property.unit.form</field>
+        <field name="model">property.unit</field>
+        <field name="arch" type="xml">
+            <form string="Property Unit">
+                <header>
+                    <button name="action_set_under_maintenance" string="Set Under Maintenance" type="object" 
+                            class="oe_highlight" invisible="state == 'under_maintenance'"/>
+                    <button name="action_set_vacant" string="Set Vacant" type="object" 
+                            class="oe_highlight" invisible="state == 'vacant'"/>
+                    <button name="action_set_reserved" string="Set Reserved" type="object" 
+                            invisible="state == 'reserved'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="vacant,occupied,under_maintenance,reserved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_contracts" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="contract_ids" widget="statinfo" string="Contracts"/>
+                        </button>
+                        <button name="action_view_maintenance" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <field name="maintenance_count" widget="statinfo" string="Maintenance"/>
+                        </button>
+                    </div>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Unit Number/Name"/>
+                        </h1>
+                        <h3>
+                            <field name="code" readonly="1"/>
+                        </h3>
+                        <div class="o_row">
+                            <field name="property_id" placeholder="Property" options="{'no_create': True}"/>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="type"/>
+                            <field name="area" widget="float"/>
+                            <field name="floor"/>
+                            <field name="furnishing"/>
+                            <label for="rental_price"/>
+                            <div class="o_row">
+                                <field name="currency_id" invisible="1"/>
+                                <field name="rental_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <span>/ month</span>
+                            </div>
+                            <field name="security_deposit" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="property_building_name" readonly="1"/>
+                            <field name="tenant_id" readonly="1" invisible="tenant_id == False"/>
+                            <field name="active_contract_id" readonly="1" invisible="active_contract_id == False"/>
+                            <field name="contract_start_date" readonly="1" invisible="contract_start_date == False"/>
+                            <field name="contract_end_date" readonly="1" invisible="contract_end_date == False"/>
+                            <field name="days_to_expire" readonly="1" invisible="days_to_expire == 0"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <group string="Amenities">
+                                    <field name="amenities" widget="many2many_tags"/>
+                                </group>
+                                <group string="Financial Overview">
+                                    <field name="expected_revenue" widget="monetary"/>
+                                    <field name="expenses" widget="monetary"/>
+                                </group>
+                            </group>
+                            <group string="Description">
+                                <field name="description" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Utilities">
+                            <group>
+                                <group string="Electricity">
+                                    <field name="has_electricity_meter"/>
+                                    <field name="electricity_meter_number" invisible="has_electricity_meter == False"/>
+                                </group>
+                                <group string="Water">
+                                    <field name="has_water_meter"/>
+                                    <field name="water_meter_number" invisible="has_water_meter == False"/>
+                                </group>
+                                <group string="Gas">
+                                    <field name="has_gas_meter"/>
+                                    <field name="gas_meter_number" invisible="has_gas_meter == False"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Property Unit List View -->
+    <record id="property_unit_view_tree" model="ir.ui.view">
+        <field name="name">property.unit.list</field>
+        <field name="model">property.unit</field>
+        <field name="arch" type="xml">
+            <list string="Property Units" decoration-success="state == 'vacant'" 
+                  decoration-danger="state == 'under_maintenance'" decoration-primary="state == 'occupied'"
+                  decoration-info="state == 'reserved'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="property_building_name"/>
+                <field name="type"/>
+                <field name="area" sum="Total Area"/>
+                <field name="rental_price" widget="monetary" sum="Total Rental"/>
+                <field name="tenant_id"/>
+                <field name="contract_end_date"/>
+                <field name="days_to_expire" invisible="1"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Property Unit Embedded List View for Property Form -->
+    <record id="property_unit_embedded_view_tree" model="ir.ui.view">
+        <field name="name">property.unit.embedded.list</field>
+        <field name="model">property.unit</field>
+        <field name="arch" type="xml">
+            <list string="Units" editable="bottom" decoration-success="state == 'vacant'" 
+                  decoration-danger="state == 'under_maintenance'" decoration-primary="state == 'occupied'">
+                <field name="name"/>
+                <field name="type"/>
+                <field name="area"/>
+                <field name="state"/>
+                <field name="rental_price" widget="monetary"/>
+                <field name="tenant_id"/>
+                <field name="contract_end_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Property Unit Search View -->
+    <record id="property_unit_view_search" model="ir.ui.view">
+        <field name="name">property.unit.search</field>
+        <field name="model">property.unit</field>
+        <field name="arch" type="xml">
+            <search string="Search Units">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="property_id"/>
+                <field name="property_building_name"/>
+                <field name="tenant_id"/>
+                <filter string="Vacant" name="vacant" domain="[('state', '=', 'vacant')]"/>
+                <filter string="Occupied" name="occupied" domain="[('state', '=', 'occupied')]"/>
+                <filter string="Under Maintenance" name="under_maintenance" domain="[('state', '=', 'under_maintenance')]"/>
+                <filter string="Reserved" name="reserved" domain="[('state', '=', 'reserved')]"/>
+                <filter string="Expiring Contracts" name="expiring" domain="[('contract_end_date', '!=', False), ('contract_end_date', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Property" name="group_by_property" context="{'group_by': 'property_id'}"/>
+                    <filter string="Building" name="group_by_building" context="{'group_by': 'property_building_name'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Unit Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                    <filter string="Tenant" name="group_by_tenant" context="{'group_by': 'tenant_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Property Unit Kanban View -->
+    <record id="property_unit_view_kanban" model="ir.ui.view">
+        <field name="name">property.unit.kanban</field>
+        <field name="model">property.unit</field>
+        <field name="arch" type="xml">
+            <kanban class="o_property_unit_kanban" default_group_by="property_id">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="property_id"/>
+                <field name="property_building_name"/>
+                <field name="type"/>
+                <field name="state"/>
+                <field name="tenant_id"/>
+                <field name="rental_price"/>
+                <field name="currency_id"/>
+                <field name="contract_end_date"/>
+                <field name="days_to_expire"/>
+                <field name="image"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill #{record.state.raw_value == 'vacant' ? 'bg-success-light' : record.state.raw_value == 'under_maintenance' ? 'bg-danger-light' : record.state.raw_value == 'occupied' ? 'bg-primary-light' : 'bg-info-light'}">
+                            <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image: url(#{kanban_image('property.unit', 'image', record.id.raw_value)})" role="img"/>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                            <small class="text-muted"> (<field name="code"/>)</small>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="mt2">
+                                        <span class="badge rounded-pill" t-attf-class="badge-#{record.state.raw_value == 'vacant' ? 'success' : record.state.raw_value == 'under_maintenance' ? 'danger' : record.state.raw_value == 'occupied' ? 'primary' : 'info'}">
+                                            <field name="state"/>
+                                        </span>
+                                        <span class="ms-2"><field name="type"/></span>
+                                    </div>
+                                    <div class="mt2" t-if="record.tenant_id.raw_value">
+                                        <b>Tenant:</b> <field name="tenant_id"/>
+                                    </div>
+                                    <div class="mt2" t-if="record.contract_end_date.raw_value">
+                                        <b>Contract End:</b> <field name="contract_end_date"/>
+                                        <span t-if="record.days_to_expire.raw_value &lt;= 30 &amp; record.days_to_expire.raw_value > 0" class="badge rounded-pill badge-warning ms-2">
+                                            <field name="days_to_expire"/> days left
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <span class="oe_kanban_amount">
+                                            <field name="rental_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Property Unit Action -->
+    <record id="action_property_units" model="ir.actions.act_window">
+        <field name="name">Units</field>
+        <field name="res_model">property.unit</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="property_unit_view_search"/>
+        <field name="context">{'default_state': 'vacant'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first property unit
+            </p>
+            <p>
+                Create units to manage individual rental spaces.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Property Amenity Views -->
+    <record id="property_amenity_view_form" model="ir.ui.view">
+        <field name="name">property.amenity.form</field>
+        <field name="model">property.amenity</field>
+        <field name="arch" type="xml">
+            <form string="Amenity">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="icon"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="property_amenity_view_tree" model="ir.ui.view">
+        <field name="name">property.amenity.list</field>
+        <field name="model">property.amenity</field>
+        <field name="arch" type="xml">
+            <list string="Amenities">
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="action_property_amenities" model="ir.actions.act_window">
+        <field name="name">Amenities</field>
+        <field name="res_model">property.amenity</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first amenity
+            </p>
+        </field>
+    </record>
+</odoo>

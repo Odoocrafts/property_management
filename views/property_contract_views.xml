@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Property Contract Form View -->
+    <record id="property_contract_view_form" model="ir.ui.view">
+        <field name="name">property.contract.form</field>
+        <field name="model">property.contract</field>
+        <field name="arch" type="xml">
+            <form string="Rental Contract">
+                <header>
+                    <button name="action_activate" string="Activate" type="object" 
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_terminate" string="Terminate" type="object" 
+                            invisible="state not in ('active')"/>
+                    <button name="action_set_to_expired" string="Set to Expired" type="object" 
+                            invisible="state not in ('active')"/>
+                    <button name="action_renew" string="Renew" type="object" 
+                            class="oe_highlight" invisible="not is_renewable or (state not in ('active', 'expired'))"/>
+                    <button name="action_create_invoice" string="Create Invoice" type="object"
+                            class="oe_highlight" invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired,terminated"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-money"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <h3>
+                            <field name="contract_type"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="property_id" options="{'no_create': True}"/>
+                            <field name="unit_id" options="{'no_create': True}" context="{'default_property_id': property_id}"/>
+                            <field name="tenant_id" options="{'no_create': True}"/>
+                            <field name="is_renewable"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="duration_months"/>
+                            <field name="next_invoice_date" readonly="1" invisible="state != 'active'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Financial Details">
+                            <group>
+                                <group>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="rent_amount" widget="monetary"/>
+                                    <field name="security_deposit" widget="monetary"/>
+                                </group>
+                                <group>
+                                    <field name="billing_cycle"/>
+                                    <field name="payment_term_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <group>
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </group>
+                        </page>
+                        <page string="Terms and Conditions">
+                            <field name="notes"/>
+                        </page>
+                        <page string="Related Contracts" invisible="is_renewal == False and renewed_contract_id == False">
+                            <group>
+                                <group>
+                                    <field name="is_renewal" invisible="1"/>
+                                    <field name="previous_contract_id" readonly="1" invisible="previous_contract_id == False"/>
+                                </group>
+                                <group>
+                                    <field name="renewed_contract_id" readonly="1" invisible="renewed_contract_id == False"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Property Contract List View -->
+    <record id="property_contract_view_tree" model="ir.ui.view">
+        <field name="name">property.contract.list</field>
+        <field name="model">property.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts" decoration-primary="state == 'active'" 
+                  decoration-success="state == 'draft'" decoration-muted="state == 'expired'"
+                  decoration-danger="state == 'terminated'">
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="unit_id"/>
+                <field name="tenant_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="duration_months"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="rent_amount" widget="monetary" sum="Total Rent"/>
+                <field name="billing_cycle"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Property Contract Search View -->
+    <record id="property_contract_view_search" model="ir.ui.view">
+        <field name="name">property.contract.search</field>
+        <field name="model">property.contract</field>
+        <field name="arch" type="xml">
+            <search string="Search Contracts">
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="unit_id"/>
+                <field name="tenant_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Active" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="Expired" name="expired" domain="[('state', '=', 'expired')]"/>
+                <filter string="Terminated" name="terminated" domain="[('state', '=', 'terminated')]"/>
+                <filter string="Renewed" name="renewed" domain="[('state', '=', 'renewed')]"/>
+                <filter string="Expiring Soon" name="expiring" domain="[('state', '=', 'active'), ('end_date', '!=', False), ('end_date', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Rental" name="rental" domain="[('contract_type', '=', 'rental')]"/>
+                <filter string="Lease" name="lease" domain="[('contract_type', '=', 'lease')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Property" name="group_by_property" context="{'group_by': 'property_id'}"/>
+                    <filter string="Unit" name="group_by_unit" context="{'group_by': 'unit_id'}"/>
+                    <filter string="Tenant" name="group_by_tenant" context="{'group_by': 'tenant_id'}"/>
+                    <filter string="Contract Type" name="group_by_contract_type" context="{'group_by': 'contract_type'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Start Month" name="group_by_start_date" context="{'group_by': 'start_date:month'}"/>
+                    <filter string="End Month" name="group_by_end_date" context="{'group_by': 'end_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Property Contract Calendar View -->
+    <record id="property_contract_view_calendar" model="ir.ui.view">
+        <field name="name">property.contract.calendar</field>
+        <field name="model">property.contract</field>
+        <field name="arch" type="xml">
+            <calendar string="Contracts" date_start="start_date" date_stop="end_date" color="tenant_id" mode="month">
+                <field name="name"/>
+                <field name="unit_id"/>
+                <field name="rent_amount"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Property Contract Action -->
+    <record id="action_property_contracts" model="ir.actions.act_window">
+        <field name="name">Rental Contracts</field>
+        <field name="res_model">property.contract</field>
+        <field name="view_mode">list,form,calendar</field>
+        <field name="search_view_id" ref="property_contract_view_search"/>
+        <field name="context">{'default_contract_type': 'rental'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first rental contract
+            </p>
+            <p>
+                Create contracts to formalize rental agreements.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Contract Renewal Wizard -->
+    <record id="view_property_contract_renew_wizard_form" model="ir.ui.view">
+        <field name="name">property.contract.renew.wizard.form</field>
+        <field name="model">property.contract.renew.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Renew Contract">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="property_id" readonly="1"/>
+                            <field name="unit_id" readonly="1"/>
+                            <field name="tenant_id"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="rent_amount" widget="monetary"/>
+                            <field name="security_deposit" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="billing_cycle"/>
+                            <field name="payment_term_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_renew_contract" string="Renew Contract" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

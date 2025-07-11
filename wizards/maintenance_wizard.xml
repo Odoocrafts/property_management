@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Create Maintenance Wizard Form -->
+    <record id="view_property_maintenance_wizard_form" model="ir.ui.view">
+        <field name="name">property.maintenance.wizard.form</field>
+        <field name="model">property.maintenance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Maintenance Request">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="property_id" options="{'no_create': True}"/>
+                            <field name="unit_id" options="{'no_create': True}"/>
+                            <field name="request_by" options="{'no_create': True}"/>
+                            <field name="maintenance_type"/>
+                        </group>
+                        <group>
+                            <field name="priority" widget="priority"/>
+                            <field name="schedule_date"/>
+                            <field name="cost"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Describe the maintenance issue..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_create_maintenance" string="Create Maintenance Request" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_create_maintenance_wizard" model="ir.actions.act_window">
+        <field name="name">Create Maintenance Request</field>
+        <field name="res_model">property.maintenance.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

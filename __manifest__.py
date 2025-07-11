@@ -1,0 +1,37 @@
+{
+    "name": "Property Management",
+    "version": "1.0",
+    "category": "Real Estate",
+    "summary": "Property rental and leasing management system",
+    "description": """
+        Comprehensive property management system for rental properties,
+        including property acquisition, tenant management, invoicing,
+        and maintenance tracking.
+    """,
+    "author": "Odoo Developer",
+    "website": "",
+    "depends": [
+        "base",
+        "mail",
+        "account",
+        "contacts",
+        "product"
+    ],
+    "data": [
+        "security/property_security.xml",
+        "security/ir.model.access.csv",
+        "data/sequence_data.xml",
+        "views/property_views.xml",
+        "views/property_unit_views.xml",
+        "views/property_contract_views.xml",
+        "views/property_maintenance_views.xml",
+        "wizards/property_contract_renew_wizard.xml",
+        "wizards/maintenance_wizard.xml",
+        "views/property_menu.xml",
+    ],
+    "demo": [],
+    "application": True,
+    "installable": True,
+    "auto_install": False,
+    "license": "LGPL-3",
+}
