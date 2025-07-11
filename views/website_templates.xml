@@ -224,6 +224,7 @@
                 </div>
             </div>
             <script type="text/javascript">
+                <![CDATA[
                 $(document).ready(function() {
                     $('#property_id').on('change', function() {
                         var property_id = $(this).val();
@@ -238,18 +239,19 @@
                                 contentType: 'application/json',
                                 success: function(data) {
                                     var units = data;
-                                    var options = '&lt;option value=""&gt;Select a unit&lt;/option&gt;';
+                                    var options = '<option value="">Select a unit</option>';
                                     for (var i = 0; i < units.length; i++) {
-                                        options += '&lt;option value="' + units[i].id + '"&gt;' + units[i].name + '&lt;/option&gt;';
+                                        options += '<option value="' + units[i].id + '">' + units[i].name + '</option>';
                                     }
                                     $('#unit_id').html(options);
                                 },
                             });
                         } else {
-                            $('#unit_id').html('&lt;option value=""&gt;Select a unit&lt;/option&gt;');
+                            $('#unit_id').html('<option value="">Select a unit</option>');
                         }
                     });
                 });
+                ]]>
             </script>
         </t>
     </template>
