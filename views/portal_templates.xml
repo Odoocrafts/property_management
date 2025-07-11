@@ -2,22 +2,22 @@
 <odoo>
     <!-- Add menu items to portal -->
     <template id="portal_my_home_menu_property" name="Portal Menu Property" inherit_id="portal.portal_breadcrumbs" priority="20">
-        <xpath expr="//ol[hasclass('o_portal_breadcrumbs')]" position="inside">
-            <li t-if="page_name == 'property'" class="o_portal_breadcrumbs_item">Properties</li>
-            <li t-if="page_name == 'property_detail'" class="o_portal_breadcrumbs_item">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'property'" class="breadcrumb-item">Properties</li>
+            <li t-if="page_name == 'property_detail'" class="breadcrumb-item">
                 <a t-if="unit" t-attf-href="/my/properties">Properties</a>
                 <t t-else="">Properties</t>
             </li>
-            <li t-if="page_name == 'property_detail' and unit" class="o_portal_breadcrumbs_item">
+            <li t-if="page_name == 'property_detail' and unit" class="breadcrumb-item">
                 <t t-esc="unit.name"/>
             </li>
 
-            <li t-if="page_name == 'maintenance'" class="o_portal_breadcrumbs_item">Maintenance Requests</li>
-            <li t-if="page_name == 'maintenance_detail'" class="o_portal_breadcrumbs_item">
+            <li t-if="page_name == 'maintenance'" class="breadcrumb-item">Maintenance Requests</li>
+            <li t-if="page_name == 'maintenance_detail'" class="breadcrumb-item">
                 <a t-if="maintenance" t-attf-href="/my/maintenance">Maintenance Requests</a>
                 <t t-else="">Maintenance Requests</t>
             </li>
-            <li t-if="page_name == 'maintenance_detail' and maintenance" class="o_portal_breadcrumbs_item">
+            <li t-if="page_name == 'maintenance_detail' and maintenance" class="breadcrumb-item">
                 <t t-esc="maintenance.name"/>
             </li>
         </xpath>
@@ -26,27 +26,37 @@
     <!-- Add menu items to portal home page -->
     <template id="portal_my_home_property" name="Portal My Home Property" inherit_id="portal.portal_my_home" priority="20">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry">
-                <t t-set="title">My Properties</t>
-                <t t-set="url" t-value="'/my/properties'"/>
-                <t t-set="placeholder_count" t-value="'property_unit_count'"/>
-            </t>
-            <t t-call="portal.portal_docs_entry">
-                <t t-set="title">Maintenance Requests</t>
-                <t t-set="url" t-value="'/my/maintenance'"/>
-                <t t-set="placeholder_count" t-value="'maintenance_count'"/>
-            </t>
+            <div t-if="property_unit_count" class="o_portal_index_card col-md-6 order-2">
+                <a t-attf-href="/my/properties" title="My Properties" class="d-flex gap-2 gap-md-3 py-3 pe-2 px-md-3 h-100 rounded text-decoration-none bg-100">
+                    <div class="alert-link">
+                        <div class="mt-0 mb-1 fs-5 fw-normal lh-1 d-flex gap-2">
+                            <t t-esc="property_unit_count"/>
+                            <span>My Properties</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div t-if="maintenance_count" class="o_portal_index_card col-md-6 order-2">
+                <a t-attf-href="/my/maintenance" title="Maintenance Requests" class="d-flex gap-2 gap-md-3 py-3 pe-2 px-md-3 h-100 rounded text-decoration-none bg-100">
+                    <div class="alert-link">
+                        <div class="mt-0 mb-1 fs-5 fw-normal lh-1 d-flex gap-2">
+                            <t t-esc="maintenance_count"/>
+                            <span>Maintenance Requests</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </xpath>
     </template>
 
     <!-- Property Units List -->
     <template id="portal_my_properties" name="My Properties">
         <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
-            <t t-call="portal.portal_searchbar">
-                <t t-set="title">My Properties</t>
-            </t>
+            <t t-set="page_name">property</t>
+            
+            <div class="o_portal_searchbar">
+                <h3 class="mb-3">My Properties</h3>
+            </div>
             <t t-if="not units">
                 <div class="alert alert-info">
                     <p>You don't have any properties assigned.</p>
@@ -88,7 +98,7 @@
                         </t>
                     </tbody>
                 </table>
-                <div class="o_portal_pager">
+                <div class="o_portal_pager d-flex justify-content-center my-3">
                     <t t-call="portal.pager"/>
                 </div>
             </t>
@@ -98,6 +108,7 @@
     <!-- Property Unit Detail -->
     <template id="portal_property_detail" name="Property Detail">
         <t t-call="portal.portal_layout">
+            <t t-set="page_name">property_detail</t>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -178,11 +189,11 @@
     <!-- Maintenance Requests List -->
     <template id="portal_my_maintenance" name="My Maintenance Requests">
         <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
-            <t t-call="portal.portal_searchbar">
-                <t t-set="title">My Maintenance Requests</t>
-            </t>
+            <t t-set="page_name">maintenance</t>
+            
+            <div class="o_portal_searchbar">
+                <h3 class="mb-3">My Maintenance Requests</h3>
+            </div>
             <div class="mb-3">
                 <a href="/maintenance/request" class="btn btn-primary">Submit New Request</a>
             </div>
@@ -249,7 +260,7 @@
                         </t>
                     </tbody>
                 </table>
-                <div class="o_portal_pager">
+                <div class="o_portal_pager d-flex justify-content-center my-3">
                     <t t-call="portal.pager"/>
                 </div>
             </t>
@@ -259,6 +270,7 @@
     <!-- Maintenance Request Detail -->
     <template id="portal_maintenance_detail" name="Maintenance Request Detail">
         <t t-call="portal.portal_layout">
+            <t t-set="page_name">maintenance_detail</t>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
