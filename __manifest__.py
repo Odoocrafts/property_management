@@ -17,8 +17,7 @@
         "contacts",
         "product",
         "portal",
-        "website",
-        "website_form"
+        "website"
     ],
     "data": [
         "security/property_security.xml",

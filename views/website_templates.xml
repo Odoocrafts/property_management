@@ -130,7 +130,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-8">
-                        <form action="/maintenance/submit" method="post" class="o_website_form" enctype="multipart/form-data">
+                        <form action="/maintenance/submit" method="post" class="form" enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
 
                             <div class="form-group mb-3">
