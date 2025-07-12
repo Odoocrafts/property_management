@@ -41,13 +41,12 @@ class PropertyPortal(CustomerPortal):
     @http.route(['/my/properties', '/my/properties/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_properties(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
         values = self._prepare_portal_layout_values()
-        partner = request.env.user.partner_id
-        PropertyUnit = request.env['property.unit']
+        property_unit_model = request.env['property.unit']
         
         domain = self._get_unit_domain()
         
         # Count for pager
-        unit_count = PropertyUnit.search_count(domain)
+        unit_count = property_unit_model.search_count(domain)
         
         # Pager
         pager = portal_pager(
@@ -58,14 +57,20 @@ class PropertyPortal(CustomerPortal):
             step=self._items_per_page
         )
         
-        # Content
-        units = PropertyUnit.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        # Content - ensure units is at least an empty list
+        units = property_unit_model.search(domain, limit=self._items_per_page, offset=pager['offset']) or []
         
         values.update({
             'units': units,
             'page_name': 'property',
             'pager': pager,
             'default_url': '/my/properties',
+            # Add empty defaults for any value that might be accessed in the template
+            'searchbar_sortings': {},
+            'searchbar_filters': {},
+            'sortby': sortby or '',
+            'filterby': '',
+            'date': date_begin,
         })
         return request.render("property_management.portal_my_properties", values)
         
@@ -76,17 +81,25 @@ class PropertyPortal(CustomerPortal):
         except (AccessError, MissingError):
             return request.redirect('/my')
             
-        values = {
+        values = self._prepare_portal_layout_values()
+        values.update({
             'unit': unit_sudo,
             'page_name': 'property_detail',
-        }
+            # Add empty defaults for any value that might be accessed in the template
+            'maintenance_requests': [],
+            'pager': {'page_count': 0},
+            'searchbar_sortings': {},
+            'searchbar_filters': {},
+            'sortby': '',
+            'filterby': '',
+            'default_url': '/my/property/' + str(unit_id),
+        })
         return request.render("property_management.portal_property_detail", values)
         
     @http.route(['/my/maintenance', '/my/maintenance/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_maintenance(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
         values = self._prepare_portal_layout_values()
-        partner = request.env.user.partner_id
-        Maintenance = request.env['property.maintenance']
+        maintenance_model = request.env['property.maintenance']
         
         domain = self._get_maintenance_domain()
         
@@ -115,7 +128,7 @@ class PropertyPortal(CustomerPortal):
         domain += searchbar_filters[filterby]['domain']
         
         # Count for pager
-        maintenance_count = Maintenance.search_count(domain)
+        maintenance_count = maintenance_model.search_count(domain)
         
         # Pager
         pager = portal_pager(
@@ -126,8 +139,8 @@ class PropertyPortal(CustomerPortal):
             step=self._items_per_page
         )
         
-        # Content
-        maintenance_requests = Maintenance.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        # Content - ensure maintenance_requests is at least an empty list
+        maintenance_requests = maintenance_model.search(domain, order=order, limit=self._items_per_page, offset=pager['offset']) or []
         
         values.update({
             'date': date_begin,
@@ -139,6 +152,8 @@ class PropertyPortal(CustomerPortal):
             'sortby': sortby,
             'searchbar_filters': searchbar_filters,
             'filterby': filterby,
+            # Add other default values to prevent undefined issues
+            'units': [],
         })
         return request.render("property_management.portal_my_maintenance", values)
         
@@ -149,8 +164,17 @@ class PropertyPortal(CustomerPortal):
         except (AccessError, MissingError):
             return request.redirect('/my')
             
-        values = {
+        values = self._prepare_portal_layout_values()
+        values.update({
             'maintenance': maintenance_sudo,
             'page_name': 'maintenance_detail',
-        }
+            # Add empty defaults for any value that might be accessed in the template
+            'units': [],
+            'pager': {'page_count': 0},
+            'searchbar_sortings': {},
+            'searchbar_filters': {},
+            'sortby': '',
+            'filterby': '',
+            'default_url': '/my/maintenance/' + str(maintenance_id),
+        })
         return request.render("property_management.portal_maintenance_detail", values)
