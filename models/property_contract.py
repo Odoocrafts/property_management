@@ -195,7 +195,7 @@ class PropertyContract(models.Model):
     def action_view_invoices(self):
         return {
             'name': _('Invoices'),
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'account.move',
             'domain': [('property_contract_id', '=', self.id)],
             'type': 'ir.actions.act_window',

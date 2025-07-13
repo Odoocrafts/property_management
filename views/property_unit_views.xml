@@ -18,7 +18,7 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_contracts" type="object" class="oe_stat_button" icon="fa-file-text-o">
-                            <field name="contract_ids" widget="statinfo" string="Contracts"/>
+                            <field name="contract_count" widget="statinfo" string="Contracts"/>
                         </button>
                         <button name="action_view_maintenance" type="object" class="oe_stat_button" icon="fa-wrench">
                             <field name="maintenance_count" widget="statinfo" string="Maintenance"/>
@@ -197,32 +197,32 @@
                                 <div class="o_kanban_record_top">
                                     <div class="o_kanban_record_headings">
                                         <strong class="o_kanban_record_title">
-                                            <field name="name"/>
-                                            <small class="text-muted"> (<field name="code"/>)</small>
+                                            <t t-esc="record.name.value"/>
+                                            <small class="text-muted"> (<t t-esc="record.code.value"/>)</small>
                                         </strong>
                                     </div>
                                 </div>
                                 <div class="o_kanban_record_body">
-                                    <div class="mt2">
-                                        <span class="badge rounded-pill" t-attf-class="badge-#{record.state.raw_value == 'vacant' ? 'success' : record.state.raw_value == 'under_maintenance' ? 'danger' : record.state.raw_value == 'occupied' ? 'primary' : 'info'}">
-                                            <field name="state"/>
+                                    <div class="mt-2">
+                                        <span class="badge" t-attf-class="badge-#{record.state.raw_value == 'vacant' ? 'success' : record.state.raw_value == 'under_maintenance' ? 'danger' : record.state.raw_value == 'occupied' ? 'primary' : 'info'}">
+                                            <t t-esc="record.state.value"/>
                                         </span>
-                                        <span class="ms-2"><field name="type"/></span>
+                                        <span class="ms-2"><t t-esc="record.type.value"/></span>
                                     </div>
-                                    <div class="mt2" t-if="record.tenant_id.raw_value">
-                                        <b>Tenant:</b> <field name="tenant_id"/>
+                                    <div class="mt-2" t-if="record.tenant_id.raw_value">
+                                        <strong>Tenant:</strong> <t t-esc="record.tenant_id.value"/>
                                     </div>
-                                    <div class="mt2" t-if="record.contract_end_date.raw_value">
-                                        <b>Contract End:</b> <field name="contract_end_date"/>
-                                        <span t-if="record.days_to_expire.raw_value &lt;= 30 &amp; record.days_to_expire.raw_value > 0" class="badge rounded-pill badge-warning ms-2">
-                                            <field name="days_to_expire"/> days left
+                                    <div class="mt-2" t-if="record.contract_end_date.raw_value">
+                                        <strong>Contract End:</strong> <t t-esc="record.contract_end_date.value"/>
+                                        <span t-if="record.days_to_expire.raw_value &lt;= 30 and record.days_to_expire.raw_value > 0" class="badge badge-warning ms-2">
+                                            <t t-esc="record.days_to_expire.value"/> days left
                                         </span>
                                     </div>
                                 </div>
                                 <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_right">
                                         <span class="oe_kanban_amount">
-                                            <field name="rental_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                            <t t-esc="record.rental_price.value"/> <t t-esc="record.currency_id.value"/>
                                         </span>
                                     </div>
                                 </div>

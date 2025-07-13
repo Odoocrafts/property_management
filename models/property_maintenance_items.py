@@ -27,7 +27,7 @@ class MaintenanceMaterial(models.Model):
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure', 
                                 related='product_id.uom_id')
     price_unit = fields.Float(string='Unit Price')
-    currency_id = fields.Many2one(related='maintenance_id.currency_id')
+    currency_id = fields.Many2one('res.currency', related='maintenance_id.currency_id', store=True)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_subtotal', store=True)
     maintenance_id = fields.Many2one('property.maintenance', string='Maintenance Request')
     

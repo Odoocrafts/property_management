@@ -123,7 +123,7 @@ class Property(models.Model):
     def action_view_units(self):
         return {
             'name': _('Property Units'),
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'property.unit',
             'domain': [('property_id', '=', self.id)],
             'type': 'ir.actions.act_window',
@@ -133,7 +133,7 @@ class Property(models.Model):
     def action_view_maintenance(self):
         return {
             'name': _('Maintenance Requests'),
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'property.maintenance',
             'domain': [('property_id', '=', self.id)],
             'type': 'ir.actions.act_window',
@@ -148,3 +148,12 @@ class Property(models.Model):
     
     def action_set_inactive(self):
         self.write({'state': 'inactive'})
+
+    def _compute_access_url(self):
+        super(Property, self)._compute_access_url()
+        for property_rec in self:
+            property_rec.access_url = '/my/property/%s' % property_rec.id
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return '%s %s' % (_('Property'), self.name)

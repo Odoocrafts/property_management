@@ -2,6 +2,9 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import datetime, date
 
+# Constants for model names
+PROPERTY_CONTRACT_MODEL = 'property.contract'
+
 class PropertyUnit(models.Model):
     _name = 'property.unit'
     _description = 'Property Unit'
@@ -61,9 +64,10 @@ class PropertyUnit(models.Model):
     expenses = fields.Monetary(string='Annual Expenses', compute='_compute_financial_metrics', store=True)
     
     # Contract Information
-    active_contract_id = fields.Many2one('property.contract', string='Active Contract', 
+    active_contract_id = fields.Many2one(PROPERTY_CONTRACT_MODEL, string='Active Contract', 
                                        compute='_compute_active_contract', store=True)
-    contract_ids = fields.One2many('property.contract', 'unit_id', string='Contracts')
+    contract_ids = fields.One2many(PROPERTY_CONTRACT_MODEL, 'unit_id', string='Contracts')
+    contract_count = fields.Integer(string='Contract Count', compute='_compute_contract_count')
     tenant_id = fields.Many2one('res.partner', string='Current Tenant', 
                                compute='_compute_active_contract', store=True)
     contract_start_date = fields.Date(related='active_contract_id.start_date', string='Contract Start', store=True)
@@ -143,8 +147,8 @@ class PropertyUnit(models.Model):
             
             # For expenses, for now we'll calculate from maintenance costs
             maintenance_expenses = sum(unit.maintenance_ids.filtered(
-                lambda m: m.state in ['completed', 'in_progress'] and 
-                m.date >= fields.Date.today().replace(month=1, day=1)
+                lambda m: m.state in ['done', 'in_progress'] and 
+                m.request_date >= fields.Date.today().replace(month=1, day=1)
             ).mapped('cost'))
             unit.expenses = maintenance_expenses
     
@@ -152,11 +156,15 @@ class PropertyUnit(models.Model):
         for unit in self:
             unit.maintenance_count = len(unit.maintenance_ids)
     
+    def _compute_contract_count(self):
+        for unit in self:
+            unit.contract_count = len(unit.contract_ids)
+    
     def action_view_contracts(self):
         return {
             'name': _('Contracts'),
-            'view_mode': 'tree,form',
-            'res_model': 'property.contract',
+            'view_mode': 'list,form',
+            'res_model': PROPERTY_CONTRACT_MODEL,
             'domain': [('unit_id', '=', self.id)],
             'type': 'ir.actions.act_window',
             'context': {'default_unit_id': self.id, 'default_property_id': self.property_id.id},
@@ -165,7 +173,7 @@ class PropertyUnit(models.Model):
     def action_view_maintenance(self):
         return {
             'name': _('Maintenance Requests'),
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'property.maintenance',
             'domain': [('unit_id', '=', self.id)],
             'type': 'ir.actions.act_window',
@@ -180,6 +188,15 @@ class PropertyUnit(models.Model):
     
     def action_set_reserved(self):
         self.write({'state': 'reserved'})
+
+    def _compute_access_url(self):
+        super(PropertyUnit, self)._compute_access_url()
+        for unit in self:
+            unit.access_url = '/my/property/%s' % unit.id
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return '%s %s' % (_('Unit'), self.name)
 
 
 class PropertyAmenity(models.Model):

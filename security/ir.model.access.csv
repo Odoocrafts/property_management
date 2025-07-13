@@ -11,6 +11,10 @@ access_maintenance_checklist_item_user,maintenance.checklist.item.user,model_mai
 access_maintenance_checklist_item_manager,maintenance.checklist.item.manager,model_maintenance_checklist_item,property_management.group_property_manager,1,1,1,1
 access_maintenance_material_user,maintenance.material.user,model_maintenance_material,property_management.group_property_user,1,1,1,0
 access_maintenance_material_manager,maintenance.material.manager,model_maintenance_material,property_management.group_property_manager,1,1,1,1
+access_property_amenity_user,property.amenity.user,model_property_amenity,property_management.group_property_user,1,0,0,0
+access_property_amenity_manager,property.amenity.manager,model_property_amenity,property_management.group_property_manager,1,1,1,1
+access_property_maintenance_wizard_user,property.maintenance.wizard.user,model_property_maintenance_wizard,property_management.group_property_user,1,1,1,1
+access_property_maintenance_wizard_manager,property.maintenance.wizard.manager,model_property_maintenance_wizard,property_management.group_property_manager,1,1,1,1
 access_property_contract_renew_wizard_user,property.contract.renew.wizard.user,model_property_contract_renew_wizard,property_management.group_property_user,1,1,1,0
 access_property_contract_renew_wizard_manager,property.contract.renew.wizard.manager,model_property_contract_renew_wizard,property_management.group_property_manager,1,1,1,1
 access_property_property_portal,property.property.portal,model_property_property,base.group_portal,1,0,0,0
@@ -18,5 +22,7 @@ access_property_unit_portal,property.unit.portal,model_property_unit,base.group_
 access_property_maintenance_portal,property.maintenance.portal,model_property_maintenance,base.group_portal,1,0,1,0
 access_maintenance_checklist_item_portal,maintenance.checklist.item.portal,model_maintenance_checklist_item,base.group_portal,1,0,0,0
 access_maintenance_material_portal,maintenance.material.portal,model_maintenance_material,base.group_portal,1,0,0,0
+access_property_amenity_portal,property.amenity.portal,model_property_amenity,base.group_portal,1,0,0,0
 access_property_property_public,property.property.public,model_property_property,,1,0,0,0
 access_property_unit_public,property.unit.public,model_property_unit,,1,0,0,0
+access_property_amenity_public,property.amenity.public,model_property_amenity,,1,0,0,0

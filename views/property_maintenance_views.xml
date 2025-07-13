@@ -139,18 +139,20 @@
                             <div class="oe_kanban_card">
                                 <div class="oe_kanban_content">
                                     <div>
-                                        <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                        <strong class="o_kanban_record_title"><t t-esc="record.name.value"/></strong>
                                     </div>
                                     <div class="text-muted">
-                                        <field name="property_id"/> - <field name="unit_id"/>
+                                        <t t-esc="record.property_id.value"/> - <t t-esc="record.unit_id.value"/>
                                     </div>
                                     <div>
-                                        <field name="priority" widget="priority"/>
+                                        <span t-attf-class="o_priority_star fa fa-star#{record.priority.raw_value > '1' ? '' : '-o'}" 
+                                              t-att-title="record.priority.value"/>
                                     </div>
                                     <div class="o_kanban_record_bottom">
                                         <div class="oe_kanban_bottom_left">
-                                            <field name="maintenance_type" widget="label_selection" 
-                                                   options="{'classes': {'corrective': 'danger', 'preventive': 'success', 'emergency': 'warning'}}"/>
+                                            <span class="badge" t-attf-class="badge-#{record.maintenance_type.raw_value == 'corrective' ? 'danger' : record.maintenance_type.raw_value == 'preventive' ? 'success' : record.maintenance_type.raw_value == 'emergency' ? 'warning' : 'info'}">
+                                                <t t-esc="record.maintenance_type.value"/>
+                                            </span>
                                         </div>
                                         <div class="oe_kanban_bottom_right">
                                             <img t-att-src="kanban_image('res.users', 'avatar_128', record.assign_to.raw_value)" 

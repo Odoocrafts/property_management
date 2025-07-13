@@ -19,8 +19,7 @@ class PropertyMaintenance(models.Model):
     property_id = fields.Many2one('property.property', string='Property', tracking=True)
     unit_id = fields.Many2one('property.unit', string='Unit', 
                             domain="[('property_id', '=', property_id)]", tracking=True)
-    request_by = fields.Many2one('res.partner', string='Requested By',
-                              default=lambda self: self.unit_id.tenant_id, tracking=True)
+    request_by = fields.Many2one('res.partner', string='Requested By', tracking=True)
     assign_to = fields.Many2one('res.users', string='Assigned To', tracking=True)
     
     # Dates
@@ -149,3 +148,12 @@ class PropertyMaintenance(models.Model):
                 'default_ref': self.name,
             }
         }
+
+    def _compute_access_url(self):
+        super(PropertyMaintenance, self)._compute_access_url()
+        for maintenance in self:
+            maintenance.access_url = '/my/maintenance/%s' % maintenance.id
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return '%s %s' % (_('Maintenance'), self.name)

@@ -5,19 +5,23 @@ from odoo.osv.expression import OR, AND
 from odoo.exceptions import AccessError, MissingError
 from collections import OrderedDict
 
+# Constants for model names
+PROPERTY_MAINTENANCE_MODEL = 'property.maintenance'
+PROPERTY_UNIT_MODEL = 'property.unit'
+
 
 class PropertyPortal(CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
         
         if 'maintenance_count' in counters:
-            maintenance_count = request.env['property.maintenance'].search_count(
+            maintenance_count = request.env[PROPERTY_MAINTENANCE_MODEL].search_count(
                 self._get_maintenance_domain()
             ) if request.env.user.has_group('base.group_portal') else 0
             values['maintenance_count'] = maintenance_count
             
         if 'property_unit_count' in counters:
-            unit_count = request.env['property.unit'].search_count(
+            unit_count = request.env[PROPERTY_UNIT_MODEL].search_count(
                 self._get_unit_domain()
             ) if request.env.user.has_group('base.group_portal') else 0
             values['property_unit_count'] = unit_count
@@ -41,7 +45,7 @@ class PropertyPortal(CustomerPortal):
     @http.route(['/my/properties', '/my/properties/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_properties(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
         values = self._prepare_portal_layout_values()
-        property_unit_model = request.env['property.unit']
+        property_unit_model = request.env[PROPERTY_UNIT_MODEL]
         
         domain = self._get_unit_domain()
         
@@ -77,7 +81,7 @@ class PropertyPortal(CustomerPortal):
     @http.route(['/my/property/<int:unit_id>'], type='http', auth="user", website=True)
     def portal_my_property_detail(self, unit_id=None, **kw):
         try:
-            unit_sudo = self._document_check_access('property.unit', unit_id)
+            unit_sudo = self._document_check_access(PROPERTY_UNIT_MODEL, unit_id)
         except (AccessError, MissingError):
             return request.redirect('/my')
             
@@ -99,7 +103,7 @@ class PropertyPortal(CustomerPortal):
     @http.route(['/my/maintenance', '/my/maintenance/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_maintenance(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
         values = self._prepare_portal_layout_values()
-        maintenance_model = request.env['property.maintenance']
+        maintenance_model = request.env[PROPERTY_MAINTENANCE_MODEL]
         
         domain = self._get_maintenance_domain()
         
@@ -160,7 +164,7 @@ class PropertyPortal(CustomerPortal):
     @http.route(['/my/maintenance/<int:maintenance_id>'], type='http', auth="user", website=True)
     def portal_my_maintenance_detail(self, maintenance_id=None, **kw):
         try:
-            maintenance_sudo = self._document_check_access('property.maintenance', maintenance_id)
+            maintenance_sudo = self._document_check_access(PROPERTY_MAINTENANCE_MODEL, maintenance_id)
         except (AccessError, MissingError):
             return request.redirect('/my')
             

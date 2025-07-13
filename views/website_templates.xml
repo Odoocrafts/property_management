@@ -80,9 +80,19 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h5 class="card-title"><t t-esc="unit.name"/></h5>
-                                                    <p><strong>Type:</strong> <t t-esc="unit.unit_type"/></p>
-                                                    <p><strong>Size:</strong> <t t-esc="unit.size"/> <t t-esc="unit.size_uom"/></p>
-                                                    <p><strong>Monthly Rent:</strong> <t t-esc="unit.rent"/> <t t-esc="unit.currency_id.symbol"/></p>
+                                                    <p><strong>Type:</strong> <t t-esc="dict(unit._fields['type'].selection).get(unit.type)"/></p>
+                                                    <p><strong>Area:</strong> <t t-esc="unit.area"/> sqm</p>
+                                                    <p><strong>Floor:</strong> <t t-esc="unit.floor"/></p>
+                                                    <t t-if="unit.rental_price">
+                                                        <p><strong>Monthly Rent:</strong> <t t-esc="unit.rental_price" t-options="{'widget': 'monetary', 'display_currency': unit.currency_id}"/></p>
+                                                    </t>
+                                                    <t t-if="unit.amenities">
+                                                        <p><strong>Amenities:</strong> 
+                                                            <t t-foreach="unit.amenities" t-as="amenity">
+                                                                <span class="badge badge-secondary me-1"><t t-esc="amenity.name"/></span>
+                                                            </t>
+                                                        </p>
+                                                    </t>
                                                 </div>
                                                 <div class="card-footer">
                                                     <a href="/contactus" class="btn btn-primary">Inquire Now</a>

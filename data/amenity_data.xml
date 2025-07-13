@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Basic Property Amenities -->
+        <record id="amenity_wifi" model="property.amenity">
+            <field name="name">WiFi</field>
+            <field name="description">High-speed internet connection</field>
+            <field name="icon">fa-wifi</field>
+        </record>
+        
+        <record id="amenity_parking" model="property.amenity">
+            <field name="name">Parking</field>
+            <field name="description">Dedicated parking space</field>
+            <field name="icon">fa-car</field>
+        </record>
+        
+        <record id="amenity_air_conditioning" model="property.amenity">
+            <field name="name">Air Conditioning</field>
+            <field name="description">Climate control system</field>
+            <field name="icon">fa-snowflake-o</field>
+        </record>
+        
+        <record id="amenity_heating" model="property.amenity">
+            <field name="name">Heating</field>
+            <field name="description">Central heating system</field>
+            <field name="icon">fa-fire</field>
+        </record>
+        
+        <record id="amenity_balcony" model="property.amenity">
+            <field name="name">Balcony</field>
+            <field name="description">Private outdoor space</field>
+            <field name="icon">fa-tree</field>
+        </record>
+        
+        <record id="amenity_gym" model="property.amenity">
+            <field name="name">Gym/Fitness Center</field>
+            <field name="description">Access to fitness facilities</field>
+            <field name="icon">fa-dumbbell</field>
+        </record>
+        
+        <record id="amenity_pool" model="property.amenity">
+            <field name="name">Swimming Pool</field>
+            <field name="description">Access to swimming pool</field>
+            <field name="icon">fa-swimmer</field>
+        </record>
+        
+        <record id="amenity_elevator" model="property.amenity">
+            <field name="name">Elevator</field>
+            <field name="description">Elevator access</field>
+            <field name="icon">fa-arrows-v</field>
+        </record>
+        
+        <record id="amenity_security" model="property.amenity">
+            <field name="name">Security System</field>
+            <field name="description">24/7 security monitoring</field>
+            <field name="icon">fa-shield</field>
+        </record>
+        
+        <record id="amenity_laundry" model="property.amenity">
+            <field name="name">Laundry</field>
+            <field name="description">Washing machine and dryer</field>
+            <field name="icon">fa-tshirt</field>
+        </record>
+        
+        <record id="amenity_dishwasher" model="property.amenity">
+            <field name="name">Dishwasher</field>
+            <field name="description">Built-in dishwasher</field>
+            <field name="icon">fa-utensils</field>
+        </record>
+        
+        <record id="amenity_furnished" model="property.amenity">
+            <field name="name">Furnished</field>
+            <field name="description">Fully furnished unit</field>
+            <field name="icon">fa-couch</field>
+        </record>
+        
+        <record id="amenity_pet_friendly" model="property.amenity">
+            <field name="name">Pet Friendly</field>
+            <field name="description">Pets are welcome</field>
+            <field name="icon">fa-paw</field>
+        </record>
+        
+        <record id="amenity_garden" model="property.amenity">
+            <field name="name">Garden</field>
+            <field name="description">Private or shared garden area</field>
+            <field name="icon">fa-leaf</field>
+        </record>
+    </data>
+</odoo>

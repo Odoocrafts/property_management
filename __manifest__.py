@@ -23,6 +23,7 @@
         "security/property_security.xml",
         "security/ir.model.access.csv",
         "data/sequence_data.xml",
+        "data/amenity_data.xml",
         "views/property_views.xml",
         "views/property_unit_views.xml",
         "views/property_contract_views.xml",

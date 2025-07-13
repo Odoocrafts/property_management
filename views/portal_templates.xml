@@ -123,8 +123,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <h5>Unit Information</h5>
-                                    <p><strong>Type:</strong> <t t-esc="unit.unit_type"/></p>
-                                    <p><strong>Size:</strong> <t t-esc="unit.size"/> <t t-esc="unit.size_uom"/></p>
+                                    <p><strong>Type:</strong> <t t-esc="unit.type"/></p>
+                                    <p><strong>Area:</strong> <t t-esc="unit.area"/> sqm</p>
                                     <p><strong>Status:</strong> <t t-esc="unit.state"/></p>
                                 </div>
                             </div>
