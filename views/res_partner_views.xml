@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Partner Form View Extension for Property Management -->
+    <record id="res_partner_property_form_view" model="ir.ui.view">
+        <field name="name">res.partner.property.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add property classification flags in header -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_property_leads" type="object" 
+                        class="oe_stat_button" icon="fa-bullhorn">
+                    <field name="property_leads_count" widget="statinfo" string="Leads"/>
+                </button>
+                <button name="action_view_property_contracts" type="object" 
+                        class="oe_stat_button" icon="fa-file-text-o">
+                    <field name="properties_purchased_count" widget="statinfo" string="Properties"/>
+                </button>
+            </xpath>
+            
+            <!-- Add property flags after category_id -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_property_prospect"/>
+                <field name="is_property_customer"/>
+                <field name="is_property_investor"/>
+            </xpath>
+            
+            <!-- Add Property Management page -->
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page string="Property Management" name="property_management">
+                    <group>
+                        <group name="prospect_classification" string="Prospect Classification">
+                            <field name="prospect_type"/>
+                            <!-- <field name="customer_category" readonly="1"/> Temporarily commented -->
+                            <!-- <field name="customer_score" readonly="1"/> Temporarily commented -->
+                            <field name="investment_purpose"/>
+                        </group>
+                        <group name="budget_info" string="Budget Information">
+                            <field name="budget_min" widget="monetary"/>
+                            <field name="budget_max" widget="monetary"/>
+                            <field name="budget_range" readonly="1"/>
+                            <field name="financing_required"/>
+                            <field name="loan_pre_approved" invisible="not financing_required"/>
+                            <field name="down_payment_ready"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group name="preferences" string="Property Preferences">
+                            <field name="preferred_unit_type"/>
+                            <field name="family_size"/>
+                            <field name="carpet_area_min"/>
+                            <field name="carpet_area_max"/>
+                            <field name="preferred_locations" widget="text"/>
+                            <field name="preferred_areas"/>
+                            <field name="preferred_amenities" widget="text"/>
+                        </group>
+                        <group name="timeline_comm" string="Timeline &amp; Communication">
+                            <field name="purchase_timeline"/>
+                            <field name="preferred_communication"/>
+                            <field name="referral_source"/>
+                            <field name="referral_commission_rate" invisible="not referral_source"/>
+                            <field name="broker_license" invisible="prospect_type != 'reseller'"/>
+                        </group>
+                    </group>
+                    
+                    <group name="financing_details" string="Financing Details" invisible="not financing_required">
+                        <field name="preferred_banks" widget="text"/>
+                    </group>
+                    
+                    <group name="investment_stats" string="Investment Statistics" invisible="not is_property_customer">
+                        <field name="total_investment_value" widget="monetary" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Partner List View Extension -->
+    <record id="res_partner_property_tree_view" model="ir.ui.view">
+        <field name="name">res.partner.property.tree</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="after">
+                <!-- <field name="customer_category" optional="show"/> Temporarily commented -->
+                <field name="budget_range" optional="show"/>
+                <field name="purchase_timeline" optional="hide"/>
+                <field name="property_leads_count" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Partner Search View Extension -->
+    <record id="res_partner_property_search_view" model="ir.ui.view">
+        <field name="name">res.partner.property.search</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='supplier']" position="after">
+                <separator/>
+                <filter name="property_prospects" string="Property Prospects" 
+                        domain="[('is_property_prospect', '=', True)]"/>
+                <filter name="property_customers" string="Property Customers" 
+                        domain="[('is_property_customer', '=', True)]"/>
+                <filter name="property_investors" string="Property Investors" 
+                        domain="[('is_property_investor', '=', True)]"/>
+                <separator/>
+                <!-- Temporarily commented filters to avoid field reference issues -->
+                <!-- <filter name="hot_leads" string="Hot Leads" 
+                        domain="[('customer_category', '=', 'hot')]"/>
+                <filter name="warm_leads" string="Warm Leads" 
+                        domain="[('customer_category', '=', 'warm')]"/> -->
+                <filter name="financing_required" string="Financing Required" 
+                        domain="[('financing_required', '=', True)]"/>
+            </xpath>
+            
+            <xpath expr="//group[@name='group_by']" position="inside">
+                <separator/>
+                <!-- <filter name="group_by_customer_category" string="Customer Category" 
+                        context="{'group_by': 'customer_category'}"/> Temporarily commented -->
+                <filter name="group_by_budget_range" string="Budget Range" 
+                        context="{'group_by': 'budget_range'}"/>
+                <filter name="group_by_prospect_type" string="Prospect Type" 
+                        context="{'group_by': 'prospect_type'}"/>
+                <filter name="group_by_investment_purpose" string="Investment Purpose" 
+                        context="{'group_by': 'investment_purpose'}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Property Prospects Action -->
+    <record id="action_property_prospects" model="ir.actions.act_window">
+        <field name="name">Property Prospects</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_property_prospect', '=', True)]</field>
+        <field name="context">{'default_is_property_prospect': True, 'default_customer': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create property prospects to track potential customers!
+            </p>
+            <p>
+                Manage your property prospects with detailed preferences, budget information,
+                and timeline tracking.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Property Customers Action -->
+    <record id="action_property_customers" model="ir.actions.act_window">
+        <field name="name">Property Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_property_customer', '=', True)]</field>
+        <field name="context">{'default_is_property_customer': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Manage your property customers!
+            </p>
+            <p>
+                Track customer purchases, investment history, and preferences for better service.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Property Investors Action -->
+    <record id="action_property_investors" model="ir.actions.act_window">
+        <field name="name">Property Investors</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_property_investor', '=', True)]</field>
+        <field name="context">{'default_is_property_investor': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Manage property investors!
+            </p>
+            <p>
+                Track investment portfolios, returns, and investor preferences.
+            </p>
+        </field>
+    </record>
+    
+</odoo>

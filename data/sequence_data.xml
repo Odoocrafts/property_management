@@ -30,10 +30,32 @@
         
         <!-- Property Maintenance Sequence -->
         <record id="seq_property_maintenance" model="ir.sequence">
-            <field name="name">Property Maintenance</field>
+            <field name="name">Property Maintenance Sequence</field>
             <field name="code">property.maintenance</field>
-            <field name="prefix">MAINT/%(year)s/</field>
+            <field name="prefix">MAINT</field>
             <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Property Lead Sequence -->
+        <record id="seq_property_lead" model="ir.sequence">
+            <field name="name">Property Lead Sequence</field>
+            <field name="code">property.lead</field>
+            <field name="prefix">LEAD</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Property Booking Sequence -->
+        <record id="seq_property_booking" model="ir.sequence">
+            <field name="name">Property Booking Sequence</field>
+            <field name="code">property.booking</field>
+            <field name="prefix">BOOK/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
             <field name="company_id" eval="False"/>
         </record>
     </data>

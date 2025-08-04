@@ -6,6 +6,33 @@
               web_icon="property_management,static/description/icon.png"
               sequence="10"/>
     
+    <!-- Leads Menu -->
+    <menuitem id="menu_leads"
+              name="Leads"
+              parent="menu_property_management_root"
+              sequence="5"/>
+              
+    <!-- Leads submenu -->
+    <menuitem id="menu_property_leads"
+              name="Property Leads"
+              parent="menu_leads"
+              action="property_lead_action"
+              sequence="10"/>
+              
+    <menuitem id="menu_property_lead_stages"
+              name="Lead Stages"
+              parent="menu_leads"
+              action="property_lead_stage_action"
+              sequence="20"/>
+    
+    <!-- Customers Menu -->
+    <menuitem id="menu_customers"
+              name="Customers"
+              parent="menu_property_management_root"
+              sequence="7"/>
+              
+    <!-- Customer submenu will be added when res_partner extension is enabled -->
+    
     <!-- Properties Menu -->
     <menuitem id="menu_properties"
               name="Properties"
@@ -30,6 +57,25 @@
               parent="menu_properties"
               action="action_property_amenities"
               sequence="30"/>
+    
+    <!-- Bookings Menu -->
+    <menuitem id="menu_bookings"
+              name="Bookings"
+              parent="menu_property_management_root"
+              sequence="15"/>
+              
+    <!-- Booking submenu -->
+    <menuitem id="menu_property_bookings"
+              name="Property Bookings"
+              parent="menu_bookings"
+              action="property_booking_action"
+              sequence="10"/>
+              
+    <menuitem id="menu_payment_plans"
+              name="Payment Plans"
+              parent="menu_bookings"
+              action="property_payment_plan_action"
+              sequence="20"/>
     
     <!-- Contracts Menu -->
     <menuitem id="menu_contracts"

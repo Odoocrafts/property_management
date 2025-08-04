@@ -15,6 +15,7 @@ class PropertyContract(models.Model):
     contract_type = fields.Selection([
         ('rental', 'Rental Contract'),
         ('lease', 'Lease Contract'),
+        ('sale', 'Sale Contract'),
     ], string='Contract Type', default='rental', required=True, tracking=True)
     
     # Relations
@@ -22,6 +23,8 @@ class PropertyContract(models.Model):
     unit_id = fields.Many2one('property.unit', string='Property Unit', required=True, tracking=True,
                             domain="[('property_id', '=', property_id), ('state', 'not in', ['occupied', 'unavailable'])]")
     tenant_id = fields.Many2one('res.partner', string='Tenant', required=True, tracking=True)
+    partner_id = fields.Many2one('res.partner', string='Customer', tracking=True)  # For sale contracts
+    booking_id = fields.Many2one('property.booking', string='Source Booking', tracking=True)
     
     # Contract Duration
     start_date = fields.Date(string='Start Date', required=True, tracking=True)

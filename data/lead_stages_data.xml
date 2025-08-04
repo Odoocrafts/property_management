@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Lead Stages -->
+        <record id="lead_stage_new" model="property.lead.stage">
+            <field name="name">New</field>
+            <field name="description">Fresh leads that need initial qualification</field>
+            <field name="sequence">10</field>
+            <field name="is_default">True</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="lead_stage_contacted" model="property.lead.stage">
+            <field name="name">Contacted</field>
+            <field name="description">Leads that have been contacted initially</field>
+            <field name="sequence">20</field>
+            <field name="color">3</field>
+        </record>
+
+        <record id="lead_stage_qualified" model="property.lead.stage">
+            <field name="name">Qualified</field>
+            <field name="description">Leads that meet basic qualification criteria</field>
+            <field name="sequence">30</field>
+            <field name="color">4</field>
+        </record>
+
+        <record id="lead_stage_site_visit" model="property.lead.stage">
+            <field name="name">Site Visit</field>
+            <field name="description">Leads scheduled for or completed site visit</field>
+            <field name="sequence">40</field>
+            <field name="color">6</field>
+        </record>
+
+        <record id="lead_stage_proposal" model="property.lead.stage">
+            <field name="name">Proposal</field>
+            <field name="description">Leads who have received proposal/quote</field>
+            <field name="sequence">50</field>
+            <field name="color">5</field>
+        </record>
+
+        <record id="lead_stage_negotiation" model="property.lead.stage">
+            <field name="name">Negotiation</field>
+            <field name="description">Leads in price/terms negotiation</field>
+            <field name="sequence">60</field>
+            <field name="color">9</field>
+        </record>
+
+        <record id="lead_stage_booking" model="property.lead.stage">
+            <field name="name">Ready for Booking</field>
+            <field name="description">Leads ready to make booking</field>
+            <field name="sequence">70</field>
+            <field name="color">10</field>
+        </record>
+
+        <record id="lead_stage_won" model="property.lead.stage">
+            <field name="name">Won</field>
+            <field name="description">Successfully converted leads</field>
+            <field name="sequence">80</field>
+            <field name="color">7</field>
+            <field name="fold">True</field>
+        </record>
+
+        <record id="lead_stage_lost" model="property.lead.stage">
+            <field name="name">Lost</field>
+            <field name="description">Lost opportunities</field>
+            <field name="sequence">90</field>
+            <field name="color">2</field>
+            <field name="fold">True</field>
+        </record>
+
+    </data>
+</odoo>

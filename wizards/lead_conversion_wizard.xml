@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Lead Conversion Wizard -->
+    <record id="lead_conversion_wizard_form" model="ir.ui.view">
+        <field name="name">property.lead.conversion.wizard.form</field>
+        <field name="model">property.lead.conversion.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Convert Lead">
+                <group>
+                    <field name="lead_id" readonly="1"/>
+                    <field name="conversion_type" widget="radio"/>
+                </group>
+                
+                <group string="Customer Information">
+                    <group>
+                        <field name="customer_name" required="1"/>
+                        <field name="customer_email" widget="email"/>
+                        <field name="customer_phone" widget="phone"/>
+                        <field name="customer_mobile" widget="phone"/>
+                    </group>
+                    <group>
+                        <field name="street"/>
+                        <field name="street2"/>
+                        <field name="city"/>
+                        <field name="state_id"/>
+                        <field name="zip"/>
+                        <field name="country_id"/>
+                    </group>
+                </group>
+                
+                <group string="Booking Details" invisible="conversion_type != 'booking'">
+                    <group>
+                        <field name="property_id" required="conversion_type == 'booking'"/>
+                        <field name="unit_id" required="conversion_type == 'booking'"/>
+                        <field name="booking_date"/>
+                        <field name="move_in_date"/>
+                        <field name="lease_duration"/>
+                    </group>
+                    <group>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="monthly_rent" widget="monetary"/>
+                        <field name="security_deposit" widget="monetary"/>
+                        <field name="create_contract"/>
+                    </group>
+                </group>
+                
+                <group string="Additional Notes">
+                    <field name="notes" nolabel="1" placeholder="Any additional notes..."/>
+                </group>
+                
+                <footer>
+                    <button string="Convert" name="action_convert" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Lead Qualification Wizard -->
+    <record id="lead_qualification_wizard_form" model="ir.ui.view">
+        <field name="name">property.lead.qualification.wizard.form</field>
+        <field name="model">property.lead.qualification.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Qualify Lead">
+                <group>
+                    <field name="lead_id" readonly="1"/>
+                    <field name="qualification_result" widget="radio"/>
+                </group>
+                
+                <group string="Qualification Criteria">
+                    <group>
+                        <field name="budget_confirmed"/>
+                        <field name="timeline_confirmed"/>
+                    </group>
+                    <group>
+                        <field name="authority_confirmed"/>
+                        <field name="need_confirmed"/>
+                    </group>
+                </group>
+                
+                <group string="Next Steps" invisible="qualification_result == 'not_qualified'">
+                    <group>
+                        <field name="next_action"/>
+                        <field name="next_activity_date" required="next_action != 'no_action'"/>
+                    </group>
+                    <group>
+                        <field name="assigned_to"/>
+                    </group>
+                </group>
+                
+                <group string="Notes">
+                    <field name="qualification_notes" nolabel="1" 
+                           placeholder="Qualification notes and comments..."/>
+                </group>
+                
+                <footer>
+                    <button string="Qualify" name="action_qualify" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Lead Merge Wizard -->
+    <record id="lead_merge_wizard_form" model="ir.ui.view">
+        <field name="name">property.lead.merge.wizard.form</field>
+        <field name="model">property.lead.merge.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Merge Leads">
+                <group>
+                    <field name="lead_ids" widget="many2many_tags" required="1"/>
+                    <field name="master_lead_id" required="1" 
+                           domain="[('id', 'in', lead_ids)]"/>
+                </group>
+                
+                <group string="Merge Information">
+                    <div class="alert alert-info" role="alert">
+                        <strong>Note:</strong> All activities, messages, and attachments from other leads 
+                        will be merged into the master lead. The other leads will be archived.
+                    </div>
+                </group>
+                
+                <group string="Additional Notes">
+                    <field name="merge_notes" nolabel="1" 
+                           placeholder="Reason for merging or additional information..."/>
+                </group>
+                
+                <footer>
+                    <button string="Merge Leads" name="action_merge" type="object" 
+                            class="btn-primary" confirm="Are you sure you want to merge these leads? This action cannot be undone."/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Actions -->
+    <record id="action_lead_conversion_wizard" model="ir.actions.act_window">
+        <field name="name">Convert Lead</field>
+        <field name="res_model">property.lead.conversion.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_lead_id': active_id}</field>
+    </record>
+
+    <record id="action_lead_qualification_wizard" model="ir.actions.act_window">
+        <field name="name">Qualify Lead</field>
+        <field name="res_model">property.lead.qualification.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_lead_id': active_id}</field>
+    </record>
+
+    <record id="action_lead_merge_wizard" model="ir.actions.act_window">
+        <field name="name">Merge Leads</field>
+        <field name="res_model">property.lead.merge.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_lead_ids': active_ids}</field>
+    </record>
+
+</odoo>

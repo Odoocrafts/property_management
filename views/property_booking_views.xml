@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Property Booking Form View -->
+    <record id="property_booking_view_form" model="ir.ui.view">
+        <field name="name">property.booking.form</field>
+        <field name="model">property.booking</field>
+        <field name="arch" type="xml">
+            <form string="Property Booking">
+                <header>
+                    <button name="action_pay_token" string="Pay Token" type="object" 
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_confirm_booking" string="Confirm Booking" type="object" 
+                            class="btn-primary" invisible="state != 'token_paid'"/>
+                    <button name="action_convert_to_sale" string="Convert to Sale" type="object" 
+                            class="btn-success" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel_booking" string="Cancel Booking" type="object" 
+                            class="btn-secondary" invisible="state not in ['draft', 'token_paid', 'confirmed']"/>
+                    <button name="action_extend_token_validity" string="Extend Validity" type="object" 
+                            class="btn-secondary" invisible="state != 'token_paid'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,token_paid,confirmed"/>
+                </header>
+                
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payments" type="object" class="oe_stat_button" icon="fa-money">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="total_paid" widget="monetary"/></span>
+                                <span class="o_stat_text">Paid</span>
+                            </div>
+                        </button>
+                        <button name="action_view_balance" type="object" class="oe_stat_button" icon="fa-balance-scale">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="balance_amount" widget="monetary"/></span>
+                                <span class="o_stat_text">Balance</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group name="booking_info" string="Booking Information">
+                            <field name="partner_id"/>
+                            <field name="lead_id"/>
+                            <field name="booking_date"/>
+                            <field name="booking_type"/>
+                        </group>
+                        <group name="property_info" string="Property Information">
+                            <field name="property_id"/>
+                            <field name="unit_id" domain="[('property_id', '=', property_id)]"/>
+                            <field name="unit_price" widget="monetary"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group name="payment_info" string="Payment Information">
+                            <field name="token_amount" widget="monetary"/>
+                            <field name="advance_amount" widget="monetary"/>
+                            <field name="payment_plan_id"/>
+                        </group>
+                        <group name="timeline_info" string="Timeline">
+                            <field name="token_validity_days"/>
+                            <field name="token_expiry_date" readonly="1"/>
+                            <field name="confirmation_deadline"/>
+                            <field name="possession_date"/>
+                            <field name="is_expired" invisible="1"/>
+                            <field name="days_to_expiry" readonly="1" invisible="not is_expired"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Payments" name="payments">
+                            <p>Payment tracking will be available after model initialization.</p>
+                            <!-- Temporarily simplified - will restore full payment tree after models are loaded -->
+                        </page>
+                        <page string="Terms &amp; Documents" name="documents">
+                            <group>
+                                <field name="terms_accepted"/>
+                                <field name="terms_acceptance_date" readonly="1"/>
+                                <field name="booking_agreement" filename="booking_agreement_filename"/>
+                                <field name="booking_agreement_filename" invisible="1"/>
+                            </group>
+                        </page>
+                        <page string="Additional Information" name="additional">
+                            <group>
+                                <field name="special_requirements" placeholder="Any special requirements or preferences..."/>
+                                <field name="internal_notes" placeholder="Internal notes..."/>
+                                <field name="cancellation_reason" invisible="state != 'cancelled'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Property Booking Tree View -->
+    <record id="property_booking_view_tree" model="ir.ui.view">
+        <field name="name">property.booking.list</field>
+        <field name="model">property.booking</field>
+        <field name="arch" type="xml">
+            <list string="Property Bookings" decoration-success="state=='confirmed'" 
+                  decoration-info="state=='token_paid'" decoration-muted="state in ['cancelled','expired']">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="property_id"/>
+                <field name="unit_id"/>
+                <field name="booking_date"/>
+                <field name="booking_type"/>
+                <field name="unit_price" widget="monetary"/>
+                <field name="token_amount" widget="monetary"/>
+                <field name="total_paid" widget="monetary"/>
+                <field name="balance_amount" widget="monetary"/>
+                <field name="token_expiry_date"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state=='confirmed'"
+                       decoration-info="state=='token_paid'"
+                       decoration-warning="state=='draft'"
+                       decoration-danger="state in ['cancelled','expired']"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Property Booking Search View -->
+    <record id="property_booking_view_search" model="ir.ui.view">
+        <field name="name">property.booking.search</field>
+        <field name="model">property.booking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="property_id"/>
+                <field name="unit_id"/>
+                <separator/>
+                <filter name="my_bookings" string="My Bookings" 
+                        domain="[('create_uid', '=', uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="token_paid" string="Token Paid" domain="[('state', '=', 'token_paid')]"/>
+                <filter name="confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <filter name="expired" string="Expired" domain="[('state', '=', 'expired')]"/>
+                <separator/>
+                <filter name="expiring_soon" string="Expiring Soon" 
+                        domain="[('days_to_expiry', '&lt;=', 7), ('days_to_expiry', '>', 0)]"/>
+                <filter name="expired_bookings" string="Expired Bookings" 
+                        domain="[('is_expired', '=', True)]"/>
+                <separator/>
+                <filter name="token_booking" string="Token Bookings" domain="[('booking_type', '=', 'token')]"/>
+                <filter name="advance_booking" string="Advance Bookings" domain="[('booking_type', '=', 'advance')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_booking_type" string="Booking Type" context="{'group_by': 'booking_type'}"/>
+                    <filter name="group_by_property" string="Property" context="{'group_by': 'property_id'}"/>
+                    <filter name="group_by_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_booking_date" string="Booking Date" context="{'group_by': 'booking_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Property Booking Kanban View -->
+    <record id="property_booking_view_kanban" model="ir.ui.view">
+        <field name="name">property.booking.kanban</field>
+        <field name="model">property.booking</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="property_id"/>
+                <field name="unit_id"/>
+                <field name="unit_price"/>
+                <field name="token_amount"/>
+                <field name="total_paid"/>
+                <field name="balance_amount"/>
+                <field name="token_expiry_date"/>
+                <field name="state"/>
+                <field name="booking_type"/>
+                <field name="days_to_expiry"/>
+                <field name="is_expired"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <br/>
+                                        <span class="o_kanban_record_subtitle">
+                                            <field name="partner_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_manage_button_section">
+                                        <a class="o_kanban_manage_toggle_button" href="#">
+                                            <i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="property_id"/> - <field name="unit_id"/>
+                                            <br/>
+                                            <strong>₹<field name="unit_price" widget="float"/></strong>
+                                            <br/>
+                                            <span t-if="record.token_expiry_date.raw_value" 
+                                                  t-attf-class="badge #{record.is_expired.raw_value ? 'badge-danger' : (record.days_to_expiry.raw_value &lt;= 7 ? 'badge-warning' : 'badge-info')}">
+                                                Expires: <field name="token_expiry_date"/>
+                                            </span>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <span t-attf-class="badge badge-#{record.booking_type.raw_value == 'token' ? 'info' : 'success'}">
+                                                <field name="booking_type"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Property Booking Action -->
+    <record id="property_booking_action" model="ir.actions.act_window">
+        <field name="name">Property Bookings</field>
+        <field name="res_model">property.booking</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first property booking!
+            </p>
+            <p>
+                Manage token bookings, advance payments, and unit reservations for your properties.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Property Payment Plan Views -->
+    <record id="property_payment_plan_view_form" model="ir.ui.view">
+        <field name="name">property.payment.plan.form</field>
+        <field name="model">property.payment.plan</field>
+        <field name="arch" type="xml">
+            <form string="Payment Plan">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Payment Plan Name"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="plan_type"/>
+                            <field name="total_installments"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="token_percentage"/>
+                            <field name="advance_percentage"/>
+                        </group>
+                    </group>
+                    
+                    <field name="description" placeholder="Plan description..."/>
+                    
+                    <notebook>
+                        <page string="Installments" name="installments">
+                            <field name="installment_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="percentage"/>
+                                    <field name="due_after_days"/>
+                                    <field name="milestone"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="property_payment_plan_view_tree" model="ir.ui.view">
+        <field name="name">property.payment.plan.list</field>
+        <field name="model">property.payment.plan</field>
+        <field name="arch" type="xml">
+            <list string="Payment Plans">
+                <field name="name"/>
+                <field name="plan_type"/>
+                <field name="total_installments"/>
+                <field name="token_percentage"/>
+                <field name="advance_percentage"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="property_payment_plan_action" model="ir.actions.act_window">
+        <field name="name">Payment Plans</field>
+        <field name="res_model">property.payment.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create payment plans for your properties!
+            </p>
+            <p>
+                Define flexible payment structures with installments and milestones.
+            </p>
+        </field>
+    </record>
+    
+</odoo>
